@@ -1,6 +1,6 @@
 import mongoose, {Schema} from "mongoose";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
-// this package is used to write aggregate queries in mongoose.
+// this package is used to write aggregate queries in mongoose. these are the complex queries not just simple CRUD operations.
 
 const videoSchema = new Schema(
     {
