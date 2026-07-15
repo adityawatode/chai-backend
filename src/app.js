@@ -1,7 +1,6 @@
 import express from "express"
 import cors from "cors"
-import cookieParser from "cookie-parser"
-
+import cookieParser from "cookie-parser"  // to perform CRUD operations on cookies on user's browser.
 const app = express()
 
 app.use(cors({
@@ -18,6 +17,7 @@ app.use(express.urlencoded({   // to parse urlencoded data from request body
     limit: "16kb"
 }))
 app.use(express.static("public")) // to serve static files from public directory. such as images, files etc
+app.use(cookieParser())
 
 
 export { app }
