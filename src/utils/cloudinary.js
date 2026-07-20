@@ -15,7 +15,7 @@ import { response } from "express";
     const uploadOnCloudinary = async (localFilePath) => {
         try {
             if(!localFilePath) return null
-            // upload fole on cloudinary
+            // upload file on cloudinary
             const response = await cloudinary.uploader.upload(localFilePath, {
                 resource_type: "auto"
             })
