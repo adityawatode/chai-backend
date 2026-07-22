@@ -20,4 +20,15 @@ app.use(express.static("public")) // to serve static files from public directory
 app.use(cookieParser())
 
 
+// routes import
+import userRouter from "./routes/user.routes.js"
+
+// routes decleration 
+app.use("/api/v1/users", userRouter)
+
+
+
+
+// https://localhost:8000/api/v1/users/register
+ 
 export { app }

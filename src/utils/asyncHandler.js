@@ -1,7 +1,7 @@
 // here request is handled with promise. if error occured, it will pass to the next middleware.
 
 const asyncHandler = (requestHandler) => {
-    (req, res, next) => {
+    return (req, res, next) => {
         Promise.resolve(requestHandler(req, res, next)).catch((error) => next(error))
     }
 }
