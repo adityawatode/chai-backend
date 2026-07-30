@@ -51,13 +51,12 @@ const userSchema = new Schema({
 }
 )
 
-userSchema.pre("save", async function (next) {   // pre hook to hash pass before saving the data.
-    if(!this.isModified("password")) {
-        return next()
+userSchema.pre("save", async function () {   // pre hook to hash pass before saving the data.
+    if (!this.isModified("password")) {
+        return
     }
-     
+
     this.password = await bcrypt.hash(this.password, 10)
-    next()
 })
 
 userSchema.methods.isPasswordCorrect = async function (password) {
