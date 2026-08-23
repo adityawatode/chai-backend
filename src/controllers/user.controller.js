@@ -426,4 +426,6 @@ export { registerUser,
          getCurrentUser,
          updateAccountDetails,
          updateUserAvatar,
-         updateUserCoverImage};
+         updateUserCoverImage,
+         getUserChannelProfile
+        };
