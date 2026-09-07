@@ -47,10 +47,10 @@ const registerUser = asyncHandler(async (req, res) => {
     const { fullname, email, username, password } = req.body;
     // console.log("email: ", email);
 
-    if (
-        [fullname, email, username, password].some((field) => 
-         field?.trim() === "")
-       ) {
+             if (
+                [fullname, email, username, password].some((field) =>
+                 !field || field.trim() === ""
+             )) {
         throw new ApiError(400, "All fields are required")
        }
 
@@ -62,8 +62,8 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(409, "User with email or username already exists")
        }
 
-       const avatarLocalPath = req.files?.avatar[0]?.path;
-       const coverImageLocalPath = req.files?.coverImage[0]?.path;
+    const avatarLocalPath = req.files?.avatar?.[0]?.path;
+    const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
 
        if(!avatarLocalPath) {
         throw new ApiError(400, "Avatar file is required");
@@ -109,8 +109,8 @@ const LoginUser = asyncHandler(async (req, res) => {
 
     const {email, username, password} = req.body
 
-    if(!(username || email)) {
-        throw new ApiError(400, "Username or email is required")
+    if((!username && !email) || !password) {
+        throw new ApiError(400, "Username/email and password are required")
     }
 
     const user = await User.findOne({
@@ -164,7 +164,7 @@ const LogoutUser = asyncHandler(async (req, res) => {
             }
         },
         {
-            new: true
+            returnDocument: "after"
         }
     )
 
@@ -184,7 +184,8 @@ const LogoutUser = asyncHandler(async (req, res) => {
 
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
-    const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
+    const incomingRefreshToken =
+        req.cookies?.refreshToken || req.body?.refreshToken
 
     if(!incomingRefreshToken) {
         throw new ApiError(401, "Unauthorized request")
@@ -208,7 +209,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         secure: true
     }
 
-    const {accessToken, newRefreshToken} = await generateAccessAndRefreshTokens(user._id)
+    const { accessToken, refreshToken: newRefreshToken } =
+        await generateAccessAndRefreshTokens(user._id)
 
     return res
     .status(200)
@@ -263,7 +265,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
         throw new ApiError(400, "All fields are required")
     }
 
-    const user = User.findByIdAndUpdate(
+    const user = await User.findByIdAndUpdate(
         req.user._id,
         {
             $set: {
@@ -271,7 +273,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
                 email
             }
         },
-        {new: true} 
+        {returnDocument: "after"}
     ).select("-password")
 
 
@@ -292,7 +294,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 
     const avatar = await uploadOnCloudinary(avatarLocalPath)
 
-    if(!avatar.url) {
+    if(!avatar?.url) {
         throw new ApiError(400, "Something went wrong while uploading avatar")
     }
 
@@ -303,8 +305,8 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
                 avatar: avatar.url
             }
         }, 
-        {new: true}
-    ).select("-password")
+        {returnDocument: "after"}
+    ).select("-password -refreshToken")
 
     return res
     .status(200)
@@ -323,7 +325,7 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 
     const coverImage = await uploadOnCloudinary(coverImageLocalPath)
 
-    if(!coverImage.url) {
+    if(!coverImage?.url) {
         throw new ApiError(400, "Something went wrong while uploading cover image")
     }
 
@@ -334,8 +336,8 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
                 coverImage: coverImage.url
             }
         },
-        {new: true}
-    ).select("-password")
+        {returnDocument: "after"}
+    ).select("-password -refreshToken")
 
     return res
     .status(200)
@@ -346,9 +348,9 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 
 
 const getUserChannelProfile = asyncHandler(async (req, res) => {
-    const {username} = req.params;
+    const username = req.params.username?.trim().toLowerCase();
 
-    if(!username?.trim()) {
+    if(!username) {
         throw new ApiError(400, "Username is missing")
     }
 
@@ -356,7 +358,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     const channel = await User.aggregate([
         {
             $match: {
-                username: username?.toLowerCase()
+                username
             }
         },
         {
