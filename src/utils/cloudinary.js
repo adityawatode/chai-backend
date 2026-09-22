@@ -26,7 +26,22 @@ import { response } from "express";
             fs.unlinkSync(localFilePath)  // delete the file from local storage
             return null
         }
-    }
+    };
+
+    const deleteOnCloudinary = async (publicId, resourceType = "image") => {
+        try {
+            if (!publicId) return null;
+
+            const result = await cloudinary.uploader.destroy(publicId, {
+                resource_type: resourceType,
+            });
+
+            return result;
+        } catch (error) {
+            return error;
+            // console.log("delete on cloudinary is failed", error);
+        }
+    };
 
 
-export { uploadOnCloudinary }
+export { uploadOnCloudinary, deleteOnCloudinary }
