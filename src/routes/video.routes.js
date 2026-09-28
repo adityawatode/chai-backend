@@ -8,7 +8,7 @@ import {
     deleteVideo,
     togglePublishStatus
 } from "../controllers/video.controller.js"
-import { upload } from "../utils/cloudinary.js";    
+import { upload } from "../middlewares/multer.middleware.js";    
 
 const router = Router();
 
