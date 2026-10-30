@@ -1,6 +1,6 @@
 <div align="center">
 
-# ☕ Chai Backend
+# Streamtube
 
 ### A Modern JavaScript Backend Built with Node.js & Express
 
